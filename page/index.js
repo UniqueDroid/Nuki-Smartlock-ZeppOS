@@ -5,7 +5,7 @@
 // outcome) - that's M2. This just proves the BLE round-trip and the Nuki
 // Web API call work end to end.
 import * as hmUI from '@zos/ui'
-import { DEVICE_WIDTH } from '../utils/config/device'
+import { DEVICE_WIDTH, DEVICE_HEIGHT } from '../utils/config/device'
 import {
   METHOD_GET_STATUS,
   METHOD_ACTION,
@@ -21,8 +21,6 @@ import {
   NUKI_STATE_UNLOCKED,
   NUKI_STATE_UNLATCHED,
 } from '../shared/protocol'
-
-const { messageBuilder } = getApp()._options.globalData
 
 // Human-readable text for every outcome the Side Service can report -
 // concept doc section 3.3 (lock state) and 4.2 (error codes) combined
@@ -44,11 +42,44 @@ ERROR_LABELS[ERR_TIMEOUT] = 'Timed out'
 Page({
   state: {},
   build() {
+    // Wrapped in try/catch (16.08.2026): the first real-device test
+    // showed a plain black screen with nothing on it at all, meaning
+    // something threw before/during build() and there's no console
+    // access yet (no zeus login -> no bridge/preview) to see what. If
+    // this still throws, at least the error message now renders instead
+    // of silence - much better than guessing blind between test rounds.
+    try {
+      this.buildUi()
+    } catch (e) {
+      hmUI.createWidget(hmUI.widget.TEXT, {
+        x: 10,
+        y: 10,
+        w: DEVICE_WIDTH - 20,
+        h: DEVICE_HEIGHT - 20,
+        color: 0xff5555,
+        text_size: 22,
+        text_style: hmUI.text_style.WRAP,
+        text: 'build() error:\n' + (e && (e.stack || e.message) || String(e)),
+      })
+    }
+  },
+
+  buildUi() {
+    // messageBuilder is read here (page-build time), not at module scope
+    // - guaranteed to run after app.js's onCreate() has populated
+    // globalData, whereas a top-level read could in principle race it.
+    this.messageBuilder = getApp()._options.globalData.messageBuilder
+
+    // Layout tightened (17.08.2026, Jan's screenshot) - the system title
+    // bar ("ZeppNuki  17:43") eats some space at the very top that isn't
+    // part of DEVICE_HEIGHT's usable area, so the original 260/340/420
+    // button stack ran the last button (Unlock) off the bottom edge.
+    // Pulled everything up and tightened the gaps.
     hmUI.createWidget(hmUI.widget.TEXT, {
       x: 20,
-      y: 40,
+      y: 20,
       w: DEVICE_WIDTH - 40,
-      h: 60,
+      h: 50,
       color: 0xffffff,
       text_size: 32,
       align_h: hmUI.align.CENTER_H,
@@ -57,9 +88,9 @@ Page({
 
     this.statusText = hmUI.createWidget(hmUI.widget.TEXT, {
       x: 20,
-      y: 120,
+      y: 80,
       w: DEVICE_WIDTH - 40,
-      h: 120,
+      h: 90,
       color: 0xcccccc,
       text_size: 26,
       align_h: hmUI.align.CENTER_H,
@@ -68,9 +99,9 @@ Page({
       text: 'Press Status to check.',
     })
 
-    this.makeButton('Status', 260, () => this.sendStatusRequest())
-    this.makeButton('Lock', 340, () => this.sendActionRequest(ACTION_LOCK))
-    this.makeButton('Unlock', 420, () => this.sendActionRequest(ACTION_UNLOCK))
+    this.makeButton('Status', 180, () => this.sendStatusRequest())
+    this.makeButton('Lock', 254, () => this.sendActionRequest(ACTION_LOCK))
+    this.makeButton('Unlock', 328, () => this.sendActionRequest(ACTION_UNLOCK))
   },
 
   makeButton(label, y, onClick) {
@@ -95,7 +126,7 @@ Page({
 
   sendStatusRequest() {
     this.showText('Loading...')
-    messageBuilder
+    this.messageBuilder
       .request({ method: METHOD_GET_STATUS })
       .then((res) => this.renderStatusResult(res))
       .catch(() => this.showText('BLE request failed'))
@@ -103,7 +134,7 @@ Page({
 
   sendActionRequest(action) {
     this.showText('Sending ' + action + '...')
-    messageBuilder
+    this.messageBuilder
       .request({ method: METHOD_ACTION, params: { action: action } })
       .then((res) => {
         const { result = {} } = res
