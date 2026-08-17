@@ -12,7 +12,10 @@
     "vender": "Jan",
     "description": "Nuki Smart Lock control from your wrist"
   },
-  "permissions": [],
+  "permissions": [
+    "data:os.device.info",
+    "device:os.local_storage"
+  ],
   "runtime": {
     "apiVersion": {
       "compatible": "3.0.0",
