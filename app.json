@@ -1,0 +1,52 @@
+{
+  "configVersion": "v3",
+  "app": {
+    "appId": 25464,
+    "appName": "ZeppNuki",
+    "appType": "app",
+    "version": {
+      "code": 1,
+      "name": "1.0.0"
+    },
+    "icon": "icon.png",
+    "vender": "Jan",
+    "description": "Nuki Smart Lock control from your wrist"
+  },
+  "permissions": [],
+  "runtime": {
+    "apiVersion": {
+      "compatible": "3.0.0",
+      "target": "3.0.0",
+      "minVersion": "3.0"
+    }
+  },
+  "targets": {
+    "PikeW": {
+      "module": {
+        "page": {
+          "pages": [
+            "page/index"
+          ]
+        },
+        "app-side": {
+          "path": "app-side/index"
+        },
+        "setting": {
+          "path": "setting/index"
+        }
+      },
+      "platforms": [
+        {
+          "name": "PikeW",
+          "deviceSource": 11206915
+        }
+      ]
+    }
+  },
+  "i18n": {
+    "en-US": {
+      "appName": "ZeppNuki"
+    }
+  },
+  "defaultLanguage": "en-US"
+}
