@@ -137,9 +137,15 @@ Page({
     this.messageBuilder
       .request({ method: METHOD_ACTION, params: { action: action } })
       .then((res) => {
-        const { result = {} } = res
-        if (result.error) {
-          this.showText(ERROR_LABELS[result.error] || result.error)
+        // app-side/index.js sends { error } and { result } as SIBLING
+        // fields, never error nested inside result - see its own
+        // comment. Checking res.result.error here (like a first version
+        // of this file did) always missed it, since result was {}
+        // and the real error field sat on res.error - showed
+        // "Unknown (undefined)" instead of the real error text
+        // (Jan's screenshot, 17.08.2026, untouched token/lock setup).
+        if (res.error) {
+          this.showText(ERROR_LABELS[res.error] || res.error)
           return
         }
         // Command only ACCEPTED so far (concept doc section 2), not
@@ -151,12 +157,11 @@ Page({
   },
 
   renderStatusResult(res) {
-    const { result = {} } = res
-    if (result.error) {
-      this.showText(ERROR_LABELS[result.error] || result.error)
+    if (res.error) {
+      this.showText(ERROR_LABELS[res.error] || res.error)
       return
     }
-    const lock = result
+    const lock = res.result
     if (!lock) {
       this.showText('No data')
       return
