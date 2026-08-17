@@ -2,3 +2,4 @@ node_modules/
 dist/
 .zeus/
 *.log
+test-builds/
