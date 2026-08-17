@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Hintergrund-Farbverlauf -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A1C23" />
+      <stop offset="100%" stop-color="#0D0E12" />
+    </linearGradient>
+
+    <!-- Akzent-Farbverlauf Nuki-Gelb / Smartwatch-Cyan -->
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD000" />
+      <stop offset="100%" stop-color="#FFA000" />
+    </linearGradient>
+
+    <linearGradient id="pulseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00E5FF" />
+      <stop offset="100%" stop-color="#0077FE" />
+    </linearGradient>
+
+    <!-- Glow-Effekt -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Abgerundetes App-Icon-Grid -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" stroke="#2D3139" stroke-width="6" />
+
+  <!-- Äußerer Smartwatch-Tick-Ring (Zepp OS Indikator) -->
+  <circle cx="256" cy="256" r="195" fill="none" stroke="#262A35" stroke-width="4" stroke-dasharray="6 14" />
+
+  <!-- Nuki Aluminium-Knauf Silhouette -->
+  <circle cx="256" cy="256" r="160" fill="#16181F" stroke="#2F3542" stroke-width="8" />
+
+  <!-- Leuchtender Nuki Status-Ring (Teil-Aktiv/Drehung) -->
+  <circle cx="256" cy="256" r="128" fill="none" stroke="url(#ringGrad)" stroke-width="16" stroke-linecap="round" stroke-dasharray="520 200" transform="rotate(-45 256 256)" filter="url(#glow)" />
+
+  <!-- Zentraler Smartlock-Kern / Schloss-Symbolik -->
+  <g fill="none" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Bügel / Shackle -->
+    <path d="M 216 230 V 195 C 216 172.9 233.9 155 256 155 C 278.1 155 296 172.9 296 195 V 230" stroke="#FFFFFF" />
+    <!-- Schloss-Körper -->
+    <rect x="196" y="230" width="120" height="96" rx="20" fill="#20242D" stroke="#FFFFFF" stroke-width="12" />
+    <!-- Bluetooth / Zepp-Sync Dots -->
+    <circle cx="256" cy="278" r="8" fill="url(#pulseGrad)" stroke="none" />
+    <path d="M 256 286 V 302" stroke="url(#pulseGrad)" stroke-width="6" />
+  </g>
+
+  <!-- Zepp OS Pulse Waves (Konnektivität) -->
+  <path d="M 140 256 A 116 116 0 0 1 156 195" fill="none" stroke="url(#pulseGrad)" stroke-width="8" stroke-linecap="round" />
+  <path d="M 372 256 A 116 116 0 0 0 356 195" fill="none" stroke="url(#pulseGrad)" stroke-width="8" stroke-linecap="round" />
+</svg>
