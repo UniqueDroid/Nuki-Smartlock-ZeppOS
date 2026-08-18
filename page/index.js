@@ -70,14 +70,15 @@ Page({
     // globalData, whereas a top-level read could in principle race it.
     this.messageBuilder = getApp()._options.globalData.messageBuilder
 
-    // Layout tightened (17.08.2026, Jan's screenshot) - the system title
-    // bar ("ZeppNuki  17:43") eats some space at the very top that isn't
-    // part of DEVICE_HEIGHT's usable area, so the original 260/340/420
-    // button stack ran the last button (Unlock) off the bottom edge.
-    // Pulled everything up and tightened the gaps.
+    // Layout tightened 17.08.2026 (buttons ran off the bottom), nudged
+    // down again 18.08.2026 (title now sat too close to the top edge/
+    // system title bar boundary, Jan's screenshot) - same idea, just
+    // shifted the whole block down ~15px for more top clearance while
+    // the bottom (Unlock at 343+64=407) still has plenty of room in
+    // DEVICE_HEIGHT (514).
     hmUI.createWidget(hmUI.widget.TEXT, {
       x: 20,
-      y: 20,
+      y: 35,
       w: DEVICE_WIDTH - 40,
       h: 50,
       color: 0xffffff,
@@ -88,7 +89,7 @@ Page({
 
     this.statusText = hmUI.createWidget(hmUI.widget.TEXT, {
       x: 20,
-      y: 80,
+      y: 95,
       w: DEVICE_WIDTH - 40,
       h: 90,
       color: 0xcccccc,
@@ -99,9 +100,9 @@ Page({
       text: 'Press Status to check.',
     })
 
-    this.makeButton('Status', 180, () => this.sendStatusRequest())
-    this.makeButton('Lock', 254, () => this.sendActionRequest(ACTION_LOCK))
-    this.makeButton('Unlock', 328, () => this.sendActionRequest(ACTION_UNLOCK))
+    this.makeButton('Status', 195, () => this.sendStatusRequest())
+    this.makeButton('Lock', 269, () => this.sendActionRequest(ACTION_LOCK))
+    this.makeButton('Unlock', 343, () => this.sendActionRequest(ACTION_UNLOCK))
   },
 
   makeButton(label, y, onClick) {
