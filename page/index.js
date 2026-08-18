@@ -133,7 +133,29 @@ Page({
       .catch(() => this.showText('BLE request failed'))
   },
 
+  // Double-tap-to-confirm (18.08.2026, Jan's request after realizing a
+  // stray tap on "Unlock" would open the door with zero warning): first
+  // tap arms a 3s confirmation window and shows what to do, second tap
+  // on the SAME action within that window actually sends the command.
+  // A different action tapped while one is armed re-arms for the new
+  // one instead of confirming the old one - avoids the "meant to cancel
+  // but actually confirmed the wrong action" trap. Deliberately not the
+  // separate confirm SCREEN the concept doc describes for M4/Unlatch -
+  // Jan explicitly said "reicht für M1", this is the minimal version.
   sendActionRequest(action) {
+    if (this.pendingConfirmAction !== action) {
+      this.pendingConfirmAction = action
+      clearTimeout(this.confirmTimer)
+      this.confirmTimer = setTimeout(() => {
+        this.pendingConfirmAction = null
+        this.showText('Press Status to check.')
+      }, 3000)
+      this.showText('Tap ' + action + ' again to confirm')
+      return
+    }
+
+    clearTimeout(this.confirmTimer)
+    this.pendingConfirmAction = null
     this.showText('Sending ' + action + '...')
     this.messageBuilder
       .request({ method: METHOD_ACTION, params: { action: action } })
