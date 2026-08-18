@@ -1,53 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 248 248" width="100%" height="100%">
   <defs>
-    <!-- Hintergrund-Farbverlauf -->
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1A1C23" />
-      <stop offset="100%" stop-color="#0D0E12" />
+      <stop offset="0%" stop-color="#2B3A55" />
+      <stop offset="100%" stop-color="#182333" />
     </linearGradient>
-
-    <!-- Akzent-Farbverlauf Nuki-Gelb / Smartwatch-Cyan -->
     <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FFD000" />
-      <stop offset="100%" stop-color="#FFA000" />
+      <stop offset="0%" stop-color="#4FD1FF" />
+      <stop offset="100%" stop-color="#2E86FF" />
     </linearGradient>
-
-    <linearGradient id="pulseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00E5FF" />
-      <stop offset="100%" stop-color="#0077FE" />
-    </linearGradient>
-
-    <!-- Glow-Effekt -->
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="8" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
-    </filter>
   </defs>
 
-  <!-- Abgerundetes App-Icon-Grid -->
-  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" stroke="#2D3139" stroke-width="6" />
+  <!-- Store icon requirement: true circle background, no transparency/black
+       fill, 4px transparent safe margin already accounted for by sizing
+       the circle at r=120 inside a 248x248 canvas (docs.zepp.com/docs/
+       designs/visual/icons/, 18.08.2026 rejection point 3). Deliberately
+       NOT Nuki's yellow/orange - neutral blue instead (rejection point 1
+       - avoid imitating a protected brand's look, not just its name). -->
+  <circle cx="124" cy="124" r="120" fill="url(#bgGrad)" />
 
-  <!-- Äußerer Smartwatch-Tick-Ring (Zepp OS Indikator) -->
-  <circle cx="256" cy="256" r="195" fill="none" stroke="#262A35" stroke-width="4" stroke-dasharray="6 14" />
+  <!-- Connectivity ring -->
+  <circle cx="124" cy="124" r="78" fill="none" stroke="url(#ringGrad)" stroke-width="10" stroke-linecap="round" stroke-dasharray="300 190" transform="rotate(-45 124 124)" />
 
-  <!-- Nuki Aluminium-Knauf Silhouette -->
-  <circle cx="256" cy="256" r="160" fill="#16181F" stroke="#2F3542" stroke-width="8" />
-
-  <!-- Leuchtender Nuki Status-Ring (Teil-Aktiv/Drehung) -->
-  <circle cx="256" cy="256" r="128" fill="none" stroke="url(#ringGrad)" stroke-width="16" stroke-linecap="round" stroke-dasharray="520 200" transform="rotate(-45 256 256)" filter="url(#glow)" />
-
-  <!-- Zentraler Smartlock-Kern / Schloss-Symbolik -->
-  <g fill="none" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
-    <!-- Bügel / Shackle -->
-    <path d="M 216 230 V 195 C 216 172.9 233.9 155 256 155 C 278.1 155 296 172.9 296 195 V 230" stroke="#FFFFFF" />
-    <!-- Schloss-Körper -->
-    <rect x="196" y="230" width="120" height="96" rx="20" fill="#20242D" stroke="#FFFFFF" stroke-width="12" />
-    <!-- Bluetooth / Zepp-Sync Dots -->
-    <circle cx="256" cy="278" r="8" fill="url(#pulseGrad)" stroke="none" />
-    <path d="M 256 286 V 302" stroke="url(#pulseGrad)" stroke-width="6" />
+  <!-- Padlock -->
+  <g fill="none" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 104 112 V 92 C 104 78.7 114.7 68 128 68 C 141.3 68 152 78.7 152 92 V 112" />
+    <rect x="90" y="112" width="76" height="60" rx="14" fill="#20304A" stroke="#FFFFFF" stroke-width="10" />
+    <circle cx="128" cy="138" r="6" fill="#4FD1FF" stroke="none" />
+    <path d="M 128 144 V 156" stroke="#4FD1FF" stroke-width="5" />
   </g>
-
-  <!-- Zepp OS Pulse Waves (Konnektivität) -->
-  <path d="M 140 256 A 116 116 0 0 1 156 195" fill="none" stroke="url(#pulseGrad)" stroke-width="8" stroke-linecap="round" />
-  <path d="M 372 256 A 116 116 0 0 0 356 195" fill="none" stroke="url(#pulseGrad)" stroke-width="8" stroke-linecap="round" />
 </svg>

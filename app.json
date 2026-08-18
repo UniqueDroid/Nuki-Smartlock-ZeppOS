@@ -2,15 +2,15 @@
   "configVersion": "v3",
   "app": {
     "appId": 1123822,
-    "appName": "ZeppNuki",
+    "appName": "SmartLock",
     "appType": "app",
     "version": {
-      "code": 2,
-      "name": "1.0.1"
+      "code": 3,
+      "name": "1.0.2"
     },
     "icon": "icon.png",
     "vender": "Jan",
-    "description": "Nuki Smart Lock control from your wrist"
+    "description": "Control your smart lock from your wrist"
   },
   "permissions": [
     "data:os.device.info",

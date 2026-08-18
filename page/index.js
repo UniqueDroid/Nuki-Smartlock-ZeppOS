@@ -84,7 +84,7 @@ Page({
       color: 0xffffff,
       text_size: 32,
       align_h: hmUI.align.CENTER_H,
-      text: 'Nuki',
+      text: 'SmartLock',
     })
 
     this.statusText = hmUI.createWidget(hmUI.widget.TEXT, {
