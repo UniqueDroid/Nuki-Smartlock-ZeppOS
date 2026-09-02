@@ -2,8 +2,17 @@
 // "Load Locks" dropdown (LIST_LOCKS-driven picker) is explicitly its own
 // later milestone (M3), not M1's walking skeleton - until then, Jan
 // copies the smartlock ID straight from web.nuki.io's own dashboard.
-// View/TextInput/AppSettingsPage are Settings-App globals, no import
-// needed - same as every other zeus template's setting/index.js.
+// View/TextInput/AppSettingsPage/Section are Settings-App globals, no
+// import needed - same as every other zeus template's setting/index.js.
+//
+// Every interactive component (TextInput, Button, ...) must be wrapped in
+// Section({}, ...) - that's not optional styling, it's how the Settings
+// page's native bridge actually mounts them (see docs.zepp.com's own
+// example: Section({}, [Section({}, TextInput({label: 'Name'})), ...])).
+// A bare View() with a TextInput inside renders the View's static text
+// fine but silently drops the TextInput - confirmed on-device 02.09.2026
+// (Jan saw the "Nuki Web API Token"/"Smartlock ID" labels with no input
+// box under either).
 AppSettingsPage({
   state: {
     props: {},
@@ -18,7 +27,7 @@ AppSettingsPage({
   build(props) {
     this.setState(props)
 
-    return View(
+    return Section(
       {
         style: {
           padding: '12px',
@@ -35,15 +44,18 @@ AppSettingsPage({
           },
           ['Nuki Web API Token'],
         ),
-        TextInput({
-          type: 'password',
-          value: this.state.token,
-          placeholder: 'from web.nuki.io -> API',
-          onChange: (val) => {
-            this.state.token = val
-            this.state.props.settingsStorage.setItem('nukiToken', val)
-          },
-        }),
+        Section(
+          {},
+          TextInput({
+            type: 'password',
+            value: this.state.token,
+            placeholder: 'from web.nuki.io -> API',
+            onChange: (val) => {
+              this.state.token = val
+              this.state.props.settingsStorage.setItem('nukiToken', val)
+            },
+          }),
+        ),
         View(
           {
             style: {
@@ -55,14 +67,17 @@ AppSettingsPage({
           },
           ['Smartlock ID'],
         ),
-        TextInput({
-          value: this.state.smartlockId,
-          placeholder: 'numeric ID from the Nuki Web dashboard',
-          onChange: (val) => {
-            this.state.smartlockId = val
-            this.state.props.settingsStorage.setItem('smartlockId', val)
-          },
-        }),
+        Section(
+          {},
+          TextInput({
+            value: this.state.smartlockId,
+            placeholder: 'numeric ID from the Nuki Web dashboard',
+            onChange: (val) => {
+              this.state.smartlockId = val
+              this.state.props.settingsStorage.setItem('smartlockId', val)
+            },
+          }),
+        ),
         View(
           {
             style: {
