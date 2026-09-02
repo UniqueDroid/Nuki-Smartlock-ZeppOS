@@ -58,13 +58,19 @@ zeus build
 
 `zeus login` needs a real browser for its login callback, which a headless environment doesn't have. As a workaround, this repo hosts the latest test build's inner `.zpk` (renamed `.zip`) at `test-builds/pikew.zip`, served publicly via jsDelivr and turned into a `zpkd1://` deep link that the Zepp app's Developer Mode QR scanner accepts directly - no `zeus login`/bridge needed on the build machine.
 
+Current test build - scan with the Zepp app (Profile → Developer Mode → QR scanner):
+
+![QR code for the current sideload test build](test-builds/qr.png)
+
 ```
 zpkd1://cdn.jsdelivr.net/gh/UniqueDroid/Nuki-Smartlock-ZeppOS@<commit-sha>/test-builds/pikew.zip
 ```
 
-Pin the URL to a commit SHA, not `@main` - jsDelivr's branch-alias caching lagged behind pushes during testing, while SHA-pinned URLs resolved reliably.
+Pin the URL to a commit SHA, not `@main` - jsDelivr's branch-alias caching lagged behind pushes during testing, while SHA-pinned URLs resolved reliably. Note: since `test-builds/qr.png` and this README are themselves committed to the repo, the SHA baked into the QR image necessarily points at the commit *before* the one that added/updated the image (adding the image is what creates the newer commit) - harmless, since the app package it points to didn't change in between, but don't be surprised the SHA isn't literally `HEAD`.
 
 Important: the `zpkd1://` link must point at the **inner `.zpk`** file (itself a zip of `device.zip` + `app-side.zip`), not the outer `.zab` that `zeus build` produces - the `.zab` is just a container around one `.zpk` per target device, and the Zepp app can't parse the container directly ("Parse mini program package failed").
+
+**Updating the QR code after a new build:** extract the fresh `.zpk` into `test-builds/pikew.zip` (see the loop in project memory / prior commits for the exact `zipfile` snippet), commit+push, take the new commit's SHA, regenerate `test-builds/qr.png` from `zpkd1://cdn.jsdelivr.net/gh/UniqueDroid/Nuki-Smartlock-ZeppOS@<sha>/test-builds/pikew.zip` (e.g. Python's `qrcode` package), and commit that too.
 
 ## Lessons learned
 
