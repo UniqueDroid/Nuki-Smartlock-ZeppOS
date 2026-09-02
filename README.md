@@ -10,13 +10,27 @@ Lock, unlock and check the status of your Nuki Smart Lock right from your wrist.
 
 Full architecture concept: [`nuki-zeppos-konzept.md`](nuki-zeppos-konzept.md) (German).
 
-## Status: M1 "walking skeleton" (18.08.2026)
+## Status: M1 "walking skeleton" (published, 02.09.2026)
 
-The full round trip works end to end on a real device: watch → Side Service → Nuki Web API → response shown on the watch, including a double-tap confirmation before Lock/Unlock actually fire. Submitted to the Zepp OS app store as **SmartLock** (App ID 1123926, v1.0.2), currently awaiting review.
+The full round trip works end to end on a real device: watch → Side Service → Nuki Web API → response shown on the watch, including a double-tap confirmation before Lock/Unlock actually fire. Published on the Zepp OS app store as **SmartLock** (App ID 1123926, v1.0.4).
 
-Not yet verified against a real Nuki account with a lock actually online - `trimSmartlock()`'s field names in `app-side/index.js` are taken from the Nuki API docs, not confirmed against a live response yet.
+The smartlock ID can be set two ways: via the store-installed app's Settings page in the Zepp app (needs the Nuki Web API token there too), or directly on the watch via **Settings → Set Smartlock ID** (numeric keyboard) - the on-watch path matters for sideloaded/Developer-Mode test builds, which don't get a reachable Settings page in the Zepp app at all (see "Lessons learned" below). The API token itself is phone-Settings-only either way - too long to type on the watch.
 
-**Next step:** enter a Nuki Web API token (scopes `smartlock.action` + `smartlock.readOnly` only, not the full-access token) and the smartlock ID once the app is installed through the official store listing - QR/Developer-Mode sideloaded installs don't get a Settings page from the Zepp app (see "Lessons learned" below).
+## Getting a Nuki Web API token
+
+The app needs a token for the [Nuki Web API](https://developer.nuki.io/) to talk to your lock. Create one with only the scopes this app actually uses - not a full-access token:
+
+1. Log into [web.nuki.io](https://web.nuki.io) with your Nuki account.
+2. Open the menu → **API**.
+3. Create a new **API Token** (this is the simple "API Tokens" auth type, not OAuth 2 - no client ID/secret needed).
+4. Give it a name (e.g. "Zepp watch app") and select **only** these scopes:
+   - `smartlock.readOnly` - lets the app read lock/battery status
+   - `smartlock.action` - lets the app send lock/unlock/unlatch commands
+   Leave everything else (account, notification, smartlock.config, smartlock.auth, smartlock.log, ...) unchecked - the app doesn't need it, and a narrower token limits the blast radius if it ever leaks.
+5. Generate the token and copy it immediately - Nuki shows it once, the same way most API providers do.
+6. Paste it into the watch app: Zepp app → this app's Settings page → "Nuki Web API Token" (or the on-watch Settings screen once a token already works elsewhere - see below, the watch itself only handles the smartlock ID, not the token).
+
+API tokens don't expire on their own; they're revoked if you change your Nuki Web account password. You can find/manage or delete tokens again under the same menu → API page at any time.
 
 ## Project structure
 
@@ -26,8 +40,9 @@ app.js                   # MessageBuilder connection watch <-> Side Service
 app-side/
   index.js               # Message dispatcher (GET_STATUS/ACTION/LIST_LOCKS)
   nuki-web-backend.js     # Variant A: direct https://api.nuki.io client
-page/index.js             # Main screen: status text + Status/Lock/Unlock buttons,
+page/index.js             # Main screen: status text + Status/Lock/Unlock/Settings buttons,
                            # double-tap-to-confirm on Lock/Unlock
+page/settings.js          # On-watch Settings screen: set the smartlock ID directly
 setting/index.js          # Token + smartlock ID (Zepp app Settings page)
 shared/protocol.js         # Message types + error codes, imported by both sides
 shared/message*.js, event.js, defer.js, ...  # Zepp OS messaging scaffolding
@@ -41,7 +56,7 @@ test-builds/pikew.zip       # Latest sideload-test package (hosted for QR instal
 ## Not implemented yet (upcoming milestones)
 
 - **M2** - proper state machine (SENDING/PENDING/SUCCESS/ERROR), status polling after an action, haptics, buttons disabled while an action is in flight.
-- **M3** - "Load locks" button in Settings (`LIST_LOCKS`-driven picker) instead of typing the smartlock ID by hand.
+- **M3** - originally planned as a "Load locks" picker (`LIST_LOCKS`-driven, pick by name); built instead as direct numeric ID entry on the watch (`page/settings.js`, `createKeyboard`) since a picker needs the API token already in `settingsStorage`, which a sideloaded test build has no way to set. `LIST_LOCKS`/`handleListLocks` is still there in `app-side/index.js`, just unused by any current watch page - could still back a picker for the store-installed instance later.
 - **M4** - icons, unlatch confirmation dialog, i18n.
 - **M5** - Variant B (own proxy instead of talking to the Nuki Web API directly).
 
