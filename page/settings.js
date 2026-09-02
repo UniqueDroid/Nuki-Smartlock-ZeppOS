@@ -1,20 +1,21 @@
-// On-watch Settings screen: pick a smartlock without going through the
-// phone's Zepp app Settings page. Only the smartlock ID lives here - the
-// Nuki Web API token is a long secret string, not practical to type with
-// 4 buttons/a touchscreen keyboard, so that stays phone-side only (see
-// setting/index.js). Reuses METHOD_LIST_LOCKS, which already existed on
-// the Side Service for the (until now unbuilt) M3 "Load Locks" picker -
-// same backend call, same trimmed {id, name} result, just wired up here.
+// On-watch Settings screen: set the smartlock ID without going through
+// the phone's Zepp app Settings page. Needed for sideloaded/Developer
+// Mode test installs specifically - those don't get a reachable Settings
+// page in the Zepp app at all (a store-installed instance of the same
+// app does, but it's a SEPARATE storage from a sideloaded test build),
+// so there's no way to get an API token into settingsStorage for a
+// sideloaded instance either. That rules out a "Load locks" picker (it
+// needs the token to call the Nuki API) - direct numeric entry of an ID
+// you already looked up on web.nuki.io is the only path that works
+// without a token. The API token itself stays phone-Settings-only (too
+// long to type here) - so this screen only ever helps once you're
+// testing against a token you set up some other way, or for the
+// store-installed instance where the phone Settings page works anyway.
 import * as hmUI from '@zos/ui'
+import { createKeyboard, inputType } from '@zos/ui'
 import { back } from '@zos/router'
 import { DEVICE_WIDTH, DEVICE_HEIGHT } from '../utils/config/device'
-import { METHOD_LIST_LOCKS, METHOD_SELECT_LOCK, ERR_NO_TOKEN } from '../shared/protocol'
-
-const ERROR_LABELS = {}
-ERROR_LABELS[ERR_NO_TOKEN] = 'No token yet - set it up in the Zepp app first'
-
-const ROW_H = 66
-const LIST_TOP = 160
+import { METHOD_SELECT_LOCK } from '../shared/protocol'
 
 Page({
   state: {},
@@ -37,7 +38,6 @@ Page({
 
   buildUi() {
     this.messageBuilder = getApp()._options.globalData.messageBuilder
-    this.listWidgets = []
 
     hmUI.createWidget(hmUI.widget.TEXT, {
       x: 20,
@@ -50,22 +50,22 @@ Page({
       text: 'Settings',
     })
 
-    this.statusText = hmUI.createWidget(hmUI.widget.TEXT, {
+    this.idText = hmUI.createWidget(hmUI.widget.TEXT, {
       x: 20,
-      y: 80,
+      y: 90,
       w: DEVICE_WIDTH - 40,
-      h: 60,
+      h: 90,
       color: 0xcccccc,
-      text_size: 22,
+      text_size: 24,
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text_style: hmUI.text_style.WRAP,
-      text: 'Tap "Load locks" to pick your smartlock.',
+      text: 'Smartlock ID:\n(not set)',
     })
 
-    this.loadButton = hmUI.createWidget(hmUI.widget.BUTTON, {
+    hmUI.createWidget(hmUI.widget.BUTTON, {
       x: (DEVICE_WIDTH - 300) / 2,
-      y: 118,
+      y: 190,
       w: 300,
       h: 56,
       radius: 12,
@@ -73,8 +73,8 @@ Page({
       press_color: 0x555555,
       text_size: 26,
       color: 0xffffff,
-      text: 'Load locks',
-      click_func: () => this.loadLocks(),
+      text: 'Set Smartlock ID',
+      click_func: () => this.openKeyboard(),
     })
 
     hmUI.createWidget(hmUI.widget.BUTTON, {
@@ -92,64 +92,29 @@ Page({
     })
   },
 
-  showStatus(text) {
-    this.statusText.setProperty(hmUI.prop.TEXT, text)
-  },
-
-  clearList() {
-    this.listWidgets.forEach((w) => hmUI.deleteWidget(w))
-    this.listWidgets = []
-  },
-
-  loadLocks() {
-    this.clearList()
-    this.showStatus('Loading...')
-    this.messageBuilder
-      .request({ method: METHOD_LIST_LOCKS })
-      .then((res) => this.renderLocks(res))
-      .catch(() => this.showStatus('BLE request failed'))
-  },
-
-  renderLocks(res) {
-    if (res.error) {
-      this.showStatus(ERROR_LABELS[res.error] || res.error)
-      return
-    }
-    const locks = res.result || []
-    if (!locks.length) {
-      this.showStatus('No locks found on this Nuki account.')
-      return
-    }
-    this.showStatus('Tap a lock to select it:')
-    locks.forEach((lock, i) => {
-      const w = hmUI.createWidget(hmUI.widget.BUTTON, {
-        x: (DEVICE_WIDTH - 300) / 2,
-        y: LIST_TOP + i * (ROW_H + 8),
-        w: 300,
-        h: ROW_H,
-        radius: 12,
-        normal_color: 0x1c2b3a,
-        press_color: 0x263f57,
-        text_size: 24,
-        color: 0xffffff,
-        text: lock.name || 'Lock ' + lock.id,
-        click_func: () => this.selectLock(lock),
-      })
-      this.listWidgets.push(w)
+  openKeyboard() {
+    createKeyboard({
+      inputType: inputType.NUM,
+      text: '',
+      onComplete: (_kb, result) => {
+        const id = result && result.data
+        if (id) this.saveId(id)
+      },
+      onCancel: () => {},
     })
   },
 
-  selectLock(lock) {
-    this.showStatus('Saving...')
+  saveId(id) {
+    this.idText.setProperty(hmUI.prop.TEXT, 'Saving...')
     this.messageBuilder
-      .request({ method: METHOD_SELECT_LOCK, params: { id: lock.id } })
+      .request({ method: METHOD_SELECT_LOCK, params: { id: id } })
       .then((res) => {
         if (res.error) {
-          this.showStatus(res.error)
+          this.idText.setProperty(hmUI.prop.TEXT, res.error)
           return
         }
-        this.showStatus((lock.name || 'Lock') + ' selected.')
+        this.idText.setProperty(hmUI.prop.TEXT, 'Smartlock ID:\n' + id)
       })
-      .catch(() => this.showStatus('BLE request failed'))
+      .catch(() => this.idText.setProperty(hmUI.prop.TEXT, 'BLE request failed'))
   },
 })

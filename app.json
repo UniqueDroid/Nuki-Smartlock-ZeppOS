@@ -5,8 +5,8 @@
     "appName": "SmartLock",
     "appType": "app",
     "version": {
-      "code": 4,
-      "name": "1.0.3"
+      "code": 5,
+      "name": "1.0.4"
     },
     "icon": "icon.png",
     "vender": "Jan",
@@ -18,9 +18,9 @@
   ],
   "runtime": {
     "apiVersion": {
-      "compatible": "3.0.0",
-      "target": "3.0.0",
-      "minVersion": "3.0"
+      "compatible": "4.0.0",
+      "target": "4.0.0",
+      "minVersion": "4.0"
     }
   },
   "targets": {
