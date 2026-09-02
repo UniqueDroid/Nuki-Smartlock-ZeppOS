@@ -4,6 +4,7 @@ import {
   METHOD_ACTION,
   METHOD_LIST_LOCKS,
   METHOD_SELECT_LOCK,
+  METHOD_GET_SELECTED_LOCK,
   ERR_NO_LOCK,
 } from '../shared/protocol'
 import { listLocks, getStatus, performAction } from './nuki-web-backend'
@@ -41,6 +42,10 @@ async function handleListLocks(ctx) {
     return { id: l.smartlockId, name: l.name }
   })
   ctx.response({ data: { result: locks } })
+}
+
+function handleGetSelectedLock(ctx) {
+  ctx.response({ data: { result: { id: getSelectedSmartlockId() } } })
 }
 
 // Persists the watch-picked lock into the SAME settingsStorage key the
@@ -95,6 +100,9 @@ AppSideService({
       }
       if (payload.method === METHOD_SELECT_LOCK) {
         return handleSelectLock(payload, ctx)
+      }
+      if (payload.method === METHOD_GET_SELECTED_LOCK) {
+        return handleGetSelectedLock(ctx)
       }
       if (payload.method === METHOD_GET_STATUS) {
         return handleGetStatus(ctx)

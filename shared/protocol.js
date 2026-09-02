@@ -12,6 +12,11 @@ export const METHOD_LIST_LOCKS = 'LIST_LOCKS'
 // field) - picks a smartlock from LIST_LOCKS's result and persists it
 // into the same settingsStorage key the phone Settings page also uses.
 export const METHOD_SELECT_LOCK = 'SELECT_LOCK'
+// Lets the on-watch Settings screen show the ID actually saved right now,
+// instead of always showing a hardcoded placeholder regardless of state -
+// otherwise re-opening the screen looks like the value was never saved,
+// even when it was (Jan's report, 02.09.2026).
+export const METHOD_GET_SELECTED_LOCK = 'GET_SELECTED_LOCK'
 
 // ACTION request's `action` param.
 export const ACTION_LOCK = 'lock'

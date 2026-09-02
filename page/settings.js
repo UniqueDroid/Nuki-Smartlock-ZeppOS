@@ -15,7 +15,7 @@ import * as hmUI from '@zos/ui'
 import { createKeyboard, inputType } from '@zos/ui'
 import { back } from '@zos/router'
 import { DEVICE_WIDTH, DEVICE_HEIGHT } from '../utils/config/device'
-import { METHOD_SELECT_LOCK } from '../shared/protocol'
+import { METHOD_SELECT_LOCK, METHOD_GET_SELECTED_LOCK } from '../shared/protocol'
 
 Page({
   state: {},
@@ -60,8 +60,9 @@ Page({
       align_h: hmUI.align.CENTER_H,
       align_v: hmUI.align.CENTER_V,
       text_style: hmUI.text_style.WRAP,
-      text: 'Smartlock ID:\n(not set)',
+      text: 'Smartlock ID:\nLoading...',
     })
+    this.loadCurrentId()
 
     hmUI.createWidget(hmUI.widget.BUTTON, {
       x: (DEVICE_WIDTH - 300) / 2,
@@ -90,6 +91,23 @@ Page({
       text: 'Back',
       click_func: () => back(),
     })
+  },
+
+  // Shows the ID actually saved right now, not a hardcoded guess - without
+  // this, re-opening the page always looked like "(not set)" even right
+  // after a successful save, since the page has no memory of its own
+  // (Jan's report, 02.09.2026: looked like the save silently failed).
+  loadCurrentId() {
+    this.messageBuilder
+      .request({ method: METHOD_GET_SELECTED_LOCK })
+      .then((res) => {
+        const id = res.result && res.result.id
+        this.idText.setProperty(
+          hmUI.prop.TEXT,
+          'Smartlock ID:\n' + (id || '(not set)'),
+        )
+      })
+      .catch(() => this.idText.setProperty(hmUI.prop.TEXT, 'Smartlock ID:\n(could not check)'))
   },
 
   openKeyboard() {
