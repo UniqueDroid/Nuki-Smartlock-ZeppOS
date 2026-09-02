@@ -5,6 +5,7 @@
 // outcome) - that's M2. This just proves the BLE round-trip and the Nuki
 // Web API call work end to end.
 import * as hmUI from '@zos/ui'
+import { push } from '@zos/router'
 import { DEVICE_WIDTH, DEVICE_HEIGHT } from '../utils/config/device'
 import {
   METHOD_GET_STATUS,
@@ -103,6 +104,10 @@ Page({
     this.makeButton('Status', 195, () => this.sendStatusRequest())
     this.makeButton('Lock', 269, () => this.sendActionRequest(ACTION_LOCK))
     this.makeButton('Unlock', 343, () => this.sendActionRequest(ACTION_UNLOCK))
+    // On-watch smartlock picker (page/settings.js) - no phone Settings
+    // page trip needed just to pick which lock, only the API token still
+    // requires it (too long to type on-watch). See settings.js's header.
+    this.makeButton('Settings', 417, () => push({ url: 'page/settings' }))
   },
 
   makeButton(label, y, onClick) {

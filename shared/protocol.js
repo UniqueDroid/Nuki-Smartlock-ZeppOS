@@ -8,6 +8,10 @@
 export const METHOD_GET_STATUS = 'GET_STATUS'
 export const METHOD_ACTION = 'ACTION'
 export const METHOD_LIST_LOCKS = 'LIST_LOCKS'
+// On-watch Settings screen (no phone Settings page needed for this one
+// field) - picks a smartlock from LIST_LOCKS's result and persists it
+// into the same settingsStorage key the phone Settings page also uses.
+export const METHOD_SELECT_LOCK = 'SELECT_LOCK'
 
 // ACTION request's `action` param.
 export const ACTION_LOCK = 'lock'

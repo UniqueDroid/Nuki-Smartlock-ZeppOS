@@ -3,6 +3,7 @@ import {
   METHOD_GET_STATUS,
   METHOD_ACTION,
   METHOD_LIST_LOCKS,
+  METHOD_SELECT_LOCK,
   ERR_NO_LOCK,
 } from '../shared/protocol'
 import { listLocks, getStatus, performAction } from './nuki-web-backend'
@@ -42,6 +43,18 @@ async function handleListLocks(ctx) {
   ctx.response({ data: { result: locks } })
 }
 
+// Persists the watch-picked lock into the SAME settingsStorage key the
+// phone Settings page's TextInput writes to ('smartlockId') - whichever
+// side sets it, getSelectedSmartlockId() above reads it back the same way.
+function handleSelectLock(payload, ctx) {
+  const id = payload.params && payload.params.id
+  if (!id) {
+    return ctx.response({ data: { error: ERR_NO_LOCK } })
+  }
+  settings.settingsStorage.setItem('smartlockId', String(id))
+  ctx.response({ data: { result: 'ACK' } })
+}
+
 async function handleGetStatus(ctx) {
   const smartlockId = getSelectedSmartlockId()
   if (!smartlockId) {
@@ -79,6 +92,9 @@ AppSideService({
       const payload = messageBuilder.buf2Json(ctx.request.payload)
       if (payload.method === METHOD_LIST_LOCKS) {
         return handleListLocks(ctx)
+      }
+      if (payload.method === METHOD_SELECT_LOCK) {
+        return handleSelectLock(payload, ctx)
       }
       if (payload.method === METHOD_GET_STATUS) {
         return handleGetStatus(ctx)
