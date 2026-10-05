@@ -5,8 +5,8 @@
     "appName": "SmartLock",
     "appType": "app",
     "version": {
-      "code": 7,
-      "name": "1.0.6"
+      "code": 8,
+      "name": "1.0.7"
     },
     "icon": "icon.png",
     "vender": "Jan",

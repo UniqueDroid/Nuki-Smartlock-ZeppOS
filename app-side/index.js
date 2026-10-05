@@ -93,6 +93,21 @@ AppSideService({
   onInit() {
     messageBuilder.listen(() => {})
 
+    // docs.zepp.com's settingsStorage page: "This API only needs to be
+    // used in the Side Service. The Settings App is 'responsive' to data
+    // changes in settingsStorage, so there is no need to manually listen
+    // for data changes [there]." - i.e. the Side Service does NOT see the
+    // phone Settings page's writes live through getItem() alone, it needs
+    // this subscription to actually sync. Confirmed broken without it
+    // (Jan's report, 05.10.2026): token saved+persisted fine on the
+    // Settings page, but getStatus() kept returning ERR_NO_TOKEN no
+    // matter how often the watch app or the phone's Zepp app itself was
+    // restarted. The callback body does nothing - getToken()/
+    // getSelectedSmartlockId() already call settingsStorage.getItem()
+    // fresh on every use, so there's nothing to cache here; just
+    // registering the listener is what makes the bridge stay in sync.
+    settings.settingsStorage.addListener('change', () => {})
+
     messageBuilder.on('request', (ctx) => {
       const payload = messageBuilder.buf2Json(ctx.request.payload)
       if (payload.method === METHOD_LIST_LOCKS) {
