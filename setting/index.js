@@ -34,18 +34,14 @@ AppSettingsPage({
         },
       },
       [
-        View(
-          {
-            style: {
-              fontSize: '14px',
-              fontWeight: 'bold',
-              marginBottom: '6px',
-            },
-          },
-          ['Nuki Web API Token'],
-        ),
         Section(
-          {},
+          {
+            title: 'Nuki Web API Token',
+            description:
+              'Create the token in Nuki Web with only the scopes this ' +
+              'app needs (smartlock.action, smartlock.readOnly) - not ' +
+              'the full-access token.',
+          },
           // No 'type' prop here on purpose - docs.zepp.com's TextInput prop
           // table has no 'type'/password-masking option at all. Passing an
           // unrecognized prop (as the previous 'password' value did) made
@@ -62,41 +58,19 @@ AppSettingsPage({
             },
           }),
         ),
-        View(
-          {
-            style: {
-              fontSize: '14px',
-              fontWeight: 'bold',
-              marginTop: '18px',
-              marginBottom: '6px',
-            },
-          },
-          ['Smartlock ID'],
-        ),
         Section(
-          {},
+          {
+            title: 'Smartlock ID',
+            description: 'Numeric ID from the Nuki Web dashboard.',
+          },
           TextInput({
             value: this.state.smartlockId,
-            placeholder: 'numeric ID from the Nuki Web dashboard',
+            placeholder: 'e.g. 12345',
             onChange: (val) => {
               this.state.smartlockId = val
               this.state.props.settingsStorage.setItem('smartlockId', val)
             },
           }),
-        ),
-        View(
-          {
-            style: {
-              fontSize: '11px',
-              color: '#888',
-              marginTop: '18px',
-            },
-          },
-          [
-            'Create the token in Nuki Web with only the scopes this app ' +
-              'needs (smartlock.action, smartlock.readOnly) - not the ' +
-              'full-access token.',
-          ],
         ),
       ],
     )
