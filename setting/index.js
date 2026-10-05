@@ -46,8 +46,14 @@ AppSettingsPage({
         ),
         Section(
           {},
+          // No 'type' prop here on purpose - docs.zepp.com's TextInput prop
+          // table has no 'type'/password-masking option at all. Passing an
+          // unrecognized prop (as the previous 'password' value did) made
+          // the native Settings bridge drop the whole field silently - no
+          // box, no placeholder, nothing - while the Smartlock ID field
+          // right below it (same Section wrap, no extra prop) rendered
+          // fine. Confirmed against Jan's screenshot (02.10.2026).
           TextInput({
-            type: 'password',
             value: this.state.token,
             placeholder: 'from web.nuki.io -> API',
             onChange: (val) => {
